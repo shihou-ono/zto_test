@@ -1,0 +1,28 @@
+---
+- name: get_dropped
+  hosts: vyos
+  gather_facts: false
+
+  tasks:
+    # - name: show commands
+    #   vyos_command:
+    #     # commands: "show interfaces ethernet eth1 queue"
+    #     commands: "show arp"
+    #   register: result
+
+    # - name: debug
+    #   debug:
+    #     var: result.stdout_lines[0]
+
+    # - name: parse
+    #   debug:
+    #     var: result.stdout[0] | parse_cli_textfsm('./vyatta_vyos_show_arp.textfsm')
+
+    - name: show commands
+      vyos_command:
+        commands: "show configuration commands | match 'eth1 traffic-policy in'"
+      register: result
+
+    - name: debug
+      debug:
+        var: result.stdout[0]
