@@ -1,6 +1,0 @@
-# 出力する変数を記入
-Value DROPPED (\d+)
-
-# マッチさせるパターンを記入
-Start
-  ^\s+Sent\s+\d+\s+bytes\s+\d+\s+pkt\s+\(dropped\s+${DROPPED},.*$$-> Record

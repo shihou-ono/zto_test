@@ -1,0 +1,7 @@
+Value TYPE (\S+)
+Value DROPPED (\d+)
+
+Start
+  ^qdisc\s+${TYPE}\s+.*$$
+  ^\s+\S+\s+\d+\s+\S+\s+\d+\s+\S+\s+\S+\s+${DROPPED}\,\s+\S+\s+\d+\s+\S+\s+\d+\S+\s*$$
+  ^\s+backlog.*$$ -> Record

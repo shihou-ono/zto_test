@@ -1,15 +1,15 @@
 ---
 - name: get_dropped
-  hosts: localhost
+  hosts: vyos
   gather_facts: false
   vars:
     bandwidth_policy_list:
-    - qos_in_1k
-    - qos_in_50k
-    - qos_in_100k
-    - qos_in_500k
-    - qos_in_1m
-    - qos_in_10m
+      - qos_in_1k
+      - qos_in_50k
+      - qos_in_100k
+      - qos_in_500k
+      - qos_in_1m
+      - qos_in_10m
 
   tasks:
     - name: get current bandwidth policy
