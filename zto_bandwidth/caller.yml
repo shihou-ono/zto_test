@@ -4,6 +4,10 @@
   gather_facts: false
 
   tasks:
-    - name: import get_current_bandwidth_policy
+    - name: import measure_drop
       import_role:
-        name: get_current_bandwidth_policy
+        name: measure_drop
+
+    # - name: import get_current_bandwidth_policy
+    #   import_role:
+    #     name: get_current_bandwidth_policy

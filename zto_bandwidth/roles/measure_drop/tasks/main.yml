@@ -1,22 +1,36 @@
 ---
 - name: show commands
   vyos_command:
-    commands: "show configuration commands | match 'eth1 traffic-policy in'"
-  register: config_bandwidth_policy
+    commands: 
+      - "show interfaces ethernet eth1 queue"
+      - "show interfaces ethernet eth1 queue"
+  register: show_interfaces_ethernet_eth1_queue
 
-- name: get current bandwidth policy
+- name: init ingress_drop
   set_fact:
-    current_bandwidth_policy: "{{ config_bandwidth_policy.stdout[0] | parse_cli_textfsm(template_path) }}"
+    ingress_drop: []
+
+- name: set ingress_drop
+  set_fact:
+    ingress_drop: "{{ ingress_drop + parsed | json_query(query_string) }}"
   vars:
-    template_path: "{{ role_path }}/files/bandwidth_policy_parse.textfsm"
+    template_path: "{{ role_path }}/files/vyos_interface_queue.textfsm"
+    parsed: "{{ item | parse_cli_textfsm(template_path) }}"
+    query_string: "[?TYPE=='ingress'].DROPPED"
+  loop: "{{ show_interfaces_ethernet_eth1_queue.stdout }}"
 
-- name: get current bandwidth policy index
+- name: debug vars
+  debug:
+    var: ingress_drop
+
+- name: set is_dropped
   set_fact:
-    current_bandwidth_policy_index: "{{ bandwidth_policy_list.index(current_bandwidth_policy[0]['POLICY']) }}"
+    is_dropped: "{{ ingress_drop[0] | int < ingress_drop[1] | int }}"
 
 - name: debug vars
   debug:
     msg: "{{ item }}"
   loop:
-    - "current_bandwidth_policy: {{ current_bandwidth_policy }}"
-    - "current_bandwidth_policy_index: {{ current_bandwidth_policy_index }}"
+    - "prev_drop: {{ ingress_drop[0] }}"
+    - "last_drop: {{ ingress_drop[1] }}"
+    - "is_dropedd: {{ is_dropped }}"
