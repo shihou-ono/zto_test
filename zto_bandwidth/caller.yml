@@ -8,6 +8,10 @@
       import_role:
         name: measure_drop
 
-    # - name: import get_current_bandwidth_policy
-    #   import_role:
-    #     name: get_current_bandwidth_policy
+    - name: import stop_drop
+      
+
+
+    - name: import get_current_bandwidth_policy
+      import_role:
+        name: get_current_bandwidth_policy
