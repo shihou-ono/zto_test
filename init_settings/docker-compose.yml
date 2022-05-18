@@ -19,24 +19,6 @@ services:
       service_nw02:
         ipv4_address: 192.168.2.252
 
-  vyos02:
-    hostname: vyos02
-    container_name: vyos02
-    build:
-      context: ./vyos
-    command: /sbin/init
-    volumes:
-    - /lib/modules:/lib/modules
-    - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
-    networks:
-      mgmt_nw:
-        ipv4_address: 10.0.0.3
-      service_nw01:
-        ipv4_address: 192.168.1.253
-      service_nw02:
-        ipv4_address: 192.168.2.253
-
   host01:
     hostname: host01
     container_name: host01
