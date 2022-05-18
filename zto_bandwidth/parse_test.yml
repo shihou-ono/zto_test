@@ -1,26 +1,18 @@
 ---
 - name: get_dropped
-  hosts: localhost
+  hosts: vyos
   gather_facts: false
-  vars:
-    bandwidth_policy_list:
-    - qos_in_1k
-    - qos_in_50k
-    - qos_in_100k
-    - qos_in_500k
-    - qos_in_1m
-    - qos_in_10m
 
   tasks:
-    - name: get current bandwidth policy
-      set_fact:
-        current_bandwidth_policy_index: "{{ bandwidth_policy_list.index(bandwidth_policy[0]['POLICY']) }}"
-      vars:
-        text: "set interfaces ethernet eth1 traffic-policy in 'qos_in_1k"
-        bandwidth_policy: "{{ text | parse_cli_textfsm('./bandwidth_policy_parse.textfsm') }}"
+    - name: show command
+      vyos_command:
+        commands: 
+          - "show interfaces ethernet eth1 queue"
+      register: result
 
     - name: debug
       debug:
-        msg: "set interfaces ethernet eth1 traffic-policy in {{ next_bandwidth_policy }}"
+        var: parsed_dropped | json_query(query_string)
       vars:
-        next_bandwidth_policy: "{{ bandwidth_policy_list[current_bandwidth_policy_index | int + 1] }}"
+        parsed_dropped: "{{ result.stdout[0] | parse_cli_textfsm('./vyos_interface_queue.textfsm') }}"
+        query_string: "[?TYPE=='ingress']"

@@ -1,0 +1,8 @@
+Value TYPE (\S+)
+Value DROPPED (\S+)
+
+Start
+  ^qdisc\s+${TYPE}\s+.*$$
+  ^\s+Sent\s+\d+\s+\S+\s+\d+\s+\S+\s+\(dropped\s+${DROPPED}\,\s+.*$$
+  ^.*$$ -> Record
+  ^. -> Error
