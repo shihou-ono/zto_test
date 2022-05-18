@@ -1,12 +1,4 @@
 ---
-# - name: debug role_path
-#   debug:
-#     var: item
-#   loop:
-#     - "{{ bandwidth_policy_list }}"
-#     - "{{ role_path }}"
-#     - "{{ playbook_dir }}"
-
 - name: show commands
   vyos_command:
     commands: "show configuration commands | match 'eth1 traffic-policy in'"
@@ -17,14 +9,6 @@
     current_bandwidth_policy: "{{ config_bandwidth_policy.stdout[0] | parse_cli_textfsm(template_path) }}"
   vars:
     template_path: "{{ role_path }}/files/bandwidth_policy_parse.textfsm"
-
-# - name: debug role_path
-#   debug:
-#     var: item
-#   loop:
-#     - "{{ config_bandwidth_policy.stdout[0] }}"
-#     - "{{ current_bandwidth_policy }}"
-#     - "{{ current_bandwidth_policy[0]['POLICY'] }}"
 
 - name: get current bandwidth policy index
   set_fact:
