@@ -8,10 +8,17 @@
       import_role:
         name: measure_drop
 
-    - name: import stop_drop
-      
+    - name: block when is_dropped true 
+      block:
+        - name: import get_bandwidth_policy
+          import_role:
+            name: get_bandwidth_policy
 
+        - name: import make_config
+          import_role:
+            name: make_config
 
-    - name: import get_current_bandwidth_policy
-      import_role:
-        name: get_current_bandwidth_policy
+        - name: import set_config
+          import_role:
+            name: set_config
+      when: is_dropped

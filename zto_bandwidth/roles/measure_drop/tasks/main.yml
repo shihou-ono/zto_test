@@ -6,22 +6,14 @@
       - "show interfaces ethernet eth1 queue"
   register: show_interfaces_ethernet_eth1_queue
 
-- name: init ingress_drop
-  set_fact:
-    ingress_drop: []
-
 - name: set ingress_drop
   set_fact:
-    ingress_drop: "{{ ingress_drop + parsed | json_query(query_string) }}"
+    ingress_drop: "{{ ingress_drop | default([]) + parsed | json_query(query_string) }}"
   vars:
     template_path: "{{ role_path }}/files/vyos_interface_queue.textfsm"
     parsed: "{{ item | parse_cli_textfsm(template_path) }}"
     query_string: "[?TYPE=='ingress'].DROPPED"
   loop: "{{ show_interfaces_ethernet_eth1_queue.stdout }}"
-
-- name: debug vars
-  debug:
-    var: ingress_drop
 
 - name: set is_dropped
   set_fact:
