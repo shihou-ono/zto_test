@@ -1,0 +1,5 @@
+Value Required POLICY (\S+)
+
+Start
+  ^set\s+interfaces\s+ethernet\s+eth1\s+traffic-policy\s+in\s+\'${POLICY}\'$$ -> Record
+  ^. -> Error
