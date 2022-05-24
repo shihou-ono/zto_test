@@ -1,0 +1,13 @@
+---
+- name: increase_bandwidth
+  hosts: vyos
+  gather_facts: false
+
+  tasks:
+    - name: import make_config
+      import_role:
+        name: make_config
+
+    - name: import set_config
+      import_role:
+        name: set_config
