@@ -13,9 +13,3 @@
           host02: 'route add -net 192.168.1.0 netmask 255.255.255.0 gw 192.168.2.254 eth1'
       when: inventory_hostname in groups['centos7']
 
-    - name: set vyos
-      vyos_config:
-        src: "{{ inventory_hostname }}_config.txt"
-        save: yes
-      when: inventory_hostname in groups['vyos']
-

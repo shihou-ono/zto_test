@@ -1,4 +1,0 @@
-delete traffic-policy limiter {{ current_bandwidth_policy }} description 
-set traffic-policy limiter {{ next_bandwidth_policy }} description current_policy
-set interfaces ethernet eth1 traffic-policy in {{ next_bandwidth_policy }}
-set interfaces ethernet eth2 traffic-policy in {{ next_bandwidth_policy }}

@@ -1,0 +1,42 @@
+---
+- name: init_config
+  hosts: vyos
+  gather_facts: false
+
+  tasks:
+    - name: show command
+      vyos_command:
+        commands: "{{ item }}"
+      register: result
+      loop:
+        - "show configuration commands"
+        - "show interfaces ethernet eth1 queue"
+        - "show interfaces ethernet eth2 queue"
+
+    - name: debug
+      debug:
+        msg: "{{ item.stdout_lines }}"
+      loop: "{{ result.results }}"
+      loop_control:
+        label: "{{ item.item }}"
+
+    - name: set config
+      vyos_config:
+        src: "{{ playbook_dir }}/init_config.txt"
+        save: true
+
+    - name: show command
+      vyos_command:
+        commands: "{{ item }}"
+      register: result
+      loop:
+        - "show configuration commands"
+        - "show interfaces ethernet eth1 queue"
+        - "show interfaces ethernet eth2 queue"
+
+    - name: debug
+      debug:
+        msg: "{{ item.stdout_lines }}"
+      loop: "{{ result.results }}"
+      loop_control:
+        label: "{{ item.item }}"

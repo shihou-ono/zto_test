@@ -1,6 +1,0 @@
----
-- name: make config
-  template:
-    src: "set_next_bandwidth.j2"
-    dest: "{{ playbook_dir }}/roles/set_config/files/{{ inventory_hostname }}_set_bandwidth.txt"
-    mode: 0644

@@ -1,4 +1,0 @@
-delete traffic-policy limiter qos_in_100k description 
-set traffic-policy limiter qos_in_500k description current_policy
-set interfaces ethernet eth1 traffic-policy in qos_in_500k
-set interfaces ethernet eth2 traffic-policy in qos_in_500k

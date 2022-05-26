@@ -1,18 +1,19 @@
 from netmiko import ConnectHandler
 import textfsm
 import time
-import subprocess
 import datetime
+import fasteners
+import sys
 
 def measure_drop(net_connect):
   dropped = []
   dir_path = "/home/ec2-user/yokogushi_contents_team/zto_bandwidth"
-  interface_queue_template = open(f"{dir_path}/vyos_interface_queue.textfsm", "r")
-  parser = textfsm.TextFSM(interface_queue_template)
   for i in range(2):
     output = net_connect.send_command("show interfaces ethernet eth1 queue")
+    interface_queue_template = open(f"{dir_path}/vyos_interface_queue.textfsm", "r")
+    parser = textfsm.TextFSM(interface_queue_template)
     dropped.append(parser.ParseText(output)[1][1])
-    time.sleep(3)
+    time.sleep(10)
   return dropped
 
 def get_initial_policy(net_connect):
@@ -55,20 +56,30 @@ def set_flag(net_connect, current_policy = ""):
   is_dropped = dropped[0] < dropped[1]
 
   flag = is_dropped and bwp.not_max()
+  dt = datetime.datetime.now()
 
   msg = \
+  "######\n" \
+  f"datetime: {dt}\n" \
+  "######\n" \
   f"prev_dropped: {dropped[0]},\n" \
   f"current_dropped: {dropped[1]},\n" \
   f"prev_dropped < current_dropped: {is_dropped},\n" \
   f"current policy: {current_policy},\n" \
   f"current_policy is not max: {bwp.not_max()},\n" \
   f"need to increase bandwidth: {flag}\n"
-  print(msg)
+
+  log_path = "/home/ec2-user/yokogushi_contents_team/zto_bandwidth/log/zto_bandwidth.log"
+  with open(log_path, "a") as f:
+    f.write(msg)
+
   return flag
 
 if __name__ == '__main__':
-  print("####")
-  print(datetime.datetime.now())
+  lock = fasteners.InterProcessLock('/var/tmp/lockfile')
+
+  if not lock.acquire(blocking=False):
+    sys.exit()
 
   vyos_router = {
     "device_type": "vyos",
@@ -78,6 +89,8 @@ if __name__ == '__main__':
     "port": 22,
     # "session_log": 'netmiko_session.log'
   }
+
+  log_path = "/home/ec2-user/yokogushi_contents_team/zto_bandwidth/log/zto_bandwidth.log"
 
   net_connect = ConnectHandler(**vyos_router)
   time.sleep(3)
@@ -97,16 +110,20 @@ if __name__ == '__main__':
     ]
 
     output = net_connect.send_config_set(config, exit_config_mode=False)
-    print(output)
+    msg = output + "\n"
     time.sleep(3)
-    output = net_connect.commit()
-    print(output)
-    time.sleep(30)
 
+    output = net_connect.commit()
+    dt = datetime.datetime.now()
+    msg = output + f"{output}\n{dt}\n"
     current_policy = bwp.next_policy()
 
+    with open(log_path, "a") as f:
+      f.write(msg)
+
+    time.sleep(10)
     net_connect = ConnectHandler(**vyos_router)
     time.sleep(3)
     flag = set_flag(net_connect, current_policy)
 
-  print("####")
+  lock.release()

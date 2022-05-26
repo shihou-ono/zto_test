@@ -1,6 +1,0 @@
-# 出力する変数を記入
-Value TEST (\s+)
-
-# マッチさせるパターンを記入
-Start
-  ^\s${TEST}$$-> Record

@@ -1,8 +1,0 @@
----
-bandwidth_policy_list:
-  - qos_in_1k
-  - qos_in_50k
-  - qos_in_100k
-  - qos_in_500k
-  - qos_in_1m
-  - qos_in_10m

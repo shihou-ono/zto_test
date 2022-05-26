@@ -1,0 +1,11 @@
+---
+- hosts: all
+  gather_facts: no
+
+  tasks:
+    - name: set vyos
+      vyos_config:
+        src: "{{ inventory_hostname }}_config.txt"
+        save: yes
+      when: inventory_hostname in groups['vyos']
+
