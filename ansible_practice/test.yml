@@ -1,0 +1,21 @@
+---
+- hosts: localhost
+  gather_facts: false
+
+  vars:
+    test_var:
+      - name: apple
+        color: red
+        hardness: hard
+      - name: banana
+        color: yellow
+        hardness: soft
+  tasks:
+  
+    - name: debug
+      debug:
+        var: test_var
+
+    - name: debug
+      debug:
+        var: test_var[1]["color"]
