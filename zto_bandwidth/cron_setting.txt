@@ -1,0 +1,1 @@
+*/2 * * * * ~/venv/bin/python /home/ec2-user/yokogushi_contents_team/zto_bandwidth/zto_bandwidth.py

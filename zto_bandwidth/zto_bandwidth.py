@@ -12,7 +12,7 @@ def measure_drop(net_connect):
     output = net_connect.send_command("show interfaces ethernet eth1 queue")
     interface_queue_template = open(f"{dir_path}/vyos_interface_queue.textfsm", "r")
     parser = textfsm.TextFSM(interface_queue_template)
-    dropped.append(parser.ParseText(output)[1][1])
+    dropped.append(int(parser.ParseText(output)[1][1]))
     time.sleep(10)
   return dropped
 
@@ -43,7 +43,8 @@ class BandwidthPolicy:
     return self.current_policy_index() + 1
 
   def next_policy(self):
-    return self.bandwidth_list[self.next_policy_index()]
+    ret = self.bandwidth_list[self.next_policy_index()] if self.not_max else None
+    return ret
 
   def not_max(self):
     return self.current_policy_index() != len(self.bandwidth_list) - 1
@@ -53,19 +54,20 @@ def set_flag(net_connect, current_policy = ""):
     current_policy = get_initial_policy(net_connect)
   bwp = BandwidthPolicy(current_policy)
   dropped = measure_drop(net_connect)
-  is_dropped = dropped[0] < dropped[1]
 
+  is_dropped = dropped[0] < dropped[1]
   flag = is_dropped and bwp.not_max()
   dt = datetime.datetime.now()
 
   msg = \
   "######\n" \
-  f"datetime: {dt}\n" \
+  f"start: {dt}\n" \
   "######\n" \
   f"prev_dropped: {dropped[0]},\n" \
   f"current_dropped: {dropped[1]},\n" \
   f"prev_dropped < current_dropped: {is_dropped},\n" \
   f"current policy: {current_policy},\n" \
+  f"next policy: {bwp.next_policy()},\n" \
   f"current_policy is not max: {bwp.not_max()},\n" \
   f"need to increase bandwidth: {flag}\n"
 
@@ -115,7 +117,7 @@ if __name__ == '__main__':
 
     output = net_connect.commit()
     dt = datetime.datetime.now()
-    msg = output + f"{output}\n{dt}\n"
+    msg = msg + f"{output}\n{dt}\n"
     current_policy = bwp.next_policy()
 
     with open(log_path, "a") as f:
@@ -125,5 +127,14 @@ if __name__ == '__main__':
     net_connect = ConnectHandler(**vyos_router)
     time.sleep(3)
     flag = set_flag(net_connect, current_policy)
+
+  dt = datetime.datetime.now()
+  msg = \
+  "######\n" \
+  f"end: {dt}\n" \
+  "######\n"
+
+  with open(log_path, "a") as f:
+    f.write(msg)
 
   lock.release()
